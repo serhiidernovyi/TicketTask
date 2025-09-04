@@ -1,14 +1,10 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\Ticket\StatsController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\TaskController;
 use App\Http\Controllers\Ticket\TicketController;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
 
-
-Route::apiResource('tickets', TicketController::class);
-Route::post('tickets/{ticket}/classify', [TicketController::class, 'classify']);
+Route::apiResource('tickets', TicketController::class)->middleware('throttle:60,1');
+Route::post('tickets/{ticket}/classify', [TicketController::class, 'classify'])->middleware('throttle:10,1');
+Route::get('stats', [StatsController::class, 'index'])->middleware('throttle:30,1');
