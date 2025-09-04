@@ -9,14 +9,17 @@ use Classification\Services\TicketClassifier;
 use Illuminate\Log\Logger;
 use Illuminate\Support\Arr;
 use Ticket\Services\TicketService;
+use Ticket\Services\StatsService;
 use Illuminate\Foundation\Application;
 use Ticket\Contracts\Services\TicketServiceInterface;
+use Ticket\Contracts\Services\StatsServiceInterface;
 
 class DomainServiceFactory
 {
     protected array $bindings = [
         TicketServiceInterface::class => TicketService::class,
         ClassifierInterface::class => TicketClassifier::class,
+        StatsServiceInterface::class => StatsService::class,
     ];
 
     /**

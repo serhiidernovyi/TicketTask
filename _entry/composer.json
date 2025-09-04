@@ -27,6 +27,7 @@
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/",
             "Ticket\\": "../Ticket/",
+            "Classification\\": "../Classification/",
             "UseCases\\": "../UseCases/"
         }
     },

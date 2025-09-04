@@ -73,7 +73,6 @@ class TicketController extends Controller
      */
     public function classify(Ticket $ticket): Response
     {
-        // Dispatch job for async classification
         \App\Jobs\ClassifyTicket::dispatch($ticket->id);
 
         return response()->json([
