@@ -1,0 +1,64 @@
+services:
+    task_app:
+        build:
+            context: ./
+            dockerfile: Dockerfile
+        image: task_app
+        container_name: task_app
+        restart: unless-stopped
+        working_dir: /var/www/html
+        volumes:
+            - ../../:/var/www/html
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+        environment:
+            PHP_IDE_CONFIG: serverName=server
+        networks:
+            - network-task
+    nginx:
+        image: nginx:latest
+        container_name: "nginx"
+        restart: unless-stopped
+        ports:
+            - "8000:80"
+        volumes:
+            - ../../:/var/www/html
+            - ./conf/nginx:/etc/nginx/conf.d
+        links:
+            - task_app
+        networks:
+            - network-task
+    mysql:
+        image: mysql:8.0
+        container_name: "mysql"
+        restart: unless-stopped
+        ports:
+            - "3306:3306"
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: mytasks
+            MYSQL_USER: mytasks
+            MYSQL_PASSWORD: secret
+        volumes:
+            - ./mysql/mytasks:/var/lib/mysql
+        networks:
+            - network-task
+    mysql_test:
+        image: mysql:8.0
+        container_name: "mysql_test"
+        restart: unless-stopped
+        ports:
+            - "3301:3306"
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: test
+            MYSQL_USER: test
+            MYSQL_PASSWORD: test
+        networks:
+            - network-task
+volumes:
+    mysql_data:
+        driver: local
+networks:
+    network-task:
+        driver: bridge
