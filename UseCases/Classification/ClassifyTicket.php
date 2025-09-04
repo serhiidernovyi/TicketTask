@@ -27,8 +27,8 @@ class ClassifyTicket
         $ticketService = $this->domainServiceFactory->create(ClassifierInterface::class);
         $classification = $ticketService->classify($ticket);
 
-//        /** @var TicketService $ticketService */
-//        $ticketService = $this->domainServiceFactory->create(TicketServiceInterface::class);
-//        $ticketService->classify($classification, $ticket);
+        /** @var TicketService $ticketService */
+        $ticketService = $this->domainServiceFactory->create(TicketServiceInterface::class);
+        $ticketService->classify($classification, $ticket);
     }
 }

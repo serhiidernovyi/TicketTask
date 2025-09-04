@@ -7,6 +7,10 @@ namespace Classification\Services;
 use App\Models\Ticket;
 use Classification\Contracts\ClassifierInterface;
 use Classification\ValueObjects\ClassificationResult;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
+use OpenAI\Exceptions\ErrorException;
+use OpenAI\Exceptions\TransporterException;
 use OpenAI\Laravel\Facades\OpenAI;
 
 class TicketClassifier implements ClassifierInterface
@@ -24,29 +28,76 @@ class TicketClassifier implements ClassifierInterface
             return $this->getRandomClassification();
         }
 
+        return Cache::remember(
+            "classify:ticket:{$ticket->id}:{$ticket->updated_at?->timestamp}",
+            3600,
+            fn () => $this->classifyWithLock($ticket)
+        );
+    }
+
+    /**
+     * Classify with lock to prevent concurrent requests
+     */
+    private function classifyWithLock(Ticket $ticket): ClassificationResult
+    {
+        return Cache::lock("classify:ticket:{$ticket->id}", 15)->block(5, function () use ($ticket) {
+            return $this->classifyOnce($ticket);
+        });
+    }
+
+    /**
+     * Single classification attempt
+     */
+    private function classifyOnce(Ticket $ticket): ClassificationResult
+    {
         try {
-            $response = OpenAI::chat()->create([
-                'model' => 'gpt-3.5-turbo',
+            $response = $this->callOpenAI([
+                'model' => 'gpt-4o-mini',
                 'messages' => [
-                    [
-                        'role' => 'system',
-                        'content' => $this->getSystemPrompt()
-                    ],
-                    [
-                        'role' => 'user',
-                        'content' => $this->buildUserPrompt($ticket)
-                    ]
+                    ['role' => 'system', 'content' => $this->getSystemPrompt()],
+                    ['role' => 'user',   'content' => $this->buildUserPrompt($ticket)],
                 ],
-                'temperature' => 0.3,
-                'max_tokens' => 500
+                'temperature' => 0.2,
+                'max_tokens'  => 80,
             ]);
 
             return $this->parseResponse($response->choices[0]->message->content);
-
-        } catch (\Exception $e) {
-            \Log::error('OpenAI classification failed: ' . $e->getMessage());
+        } catch (\Throwable $e) {
+            \Log::warning('OpenAI classification fallback', [
+                'err' => $e->getMessage(),
+                'ticket_id' => $ticket->id,
+            ]);
             return $this->getRandomClassification();
         }
+    }
+
+    /**
+     * Call OpenAI with retry logic
+     */
+    private function callOpenAI(array $payload)
+    {
+        $attempt = 0;
+
+        return retry(
+            5,
+            function () use (&$attempt, $payload) {
+                $attempt++;
+                
+                return OpenAI::chat()->create($payload);
+            },
+            function ($attempts) {
+                return 400 * (2 ** ($attempts - 1));
+            },
+
+            function ($e) {
+                if ($e instanceof ErrorException || $e instanceof TransporterException) {
+                    $msg = Str::lower($e->getMessage());
+                    return str_contains($msg, 'rate limit') || str_contains($msg, '429') ||
+                           str_contains($msg, 'timeout')    || str_contains($msg, 'temporarily');
+                }
+                return false;
+            }
+        );
     }
 
     /**

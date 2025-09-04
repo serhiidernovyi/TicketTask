@@ -24,6 +24,7 @@ use Ticket\Contracts\Entities\TicketInterface;
  * @property Carbon|null $category_changed_at
  * @property Carbon $created_at
  * @property Carbon $updated_at
+ * @method static find(string $ticketId)
  */
 class Ticket extends Model
 {

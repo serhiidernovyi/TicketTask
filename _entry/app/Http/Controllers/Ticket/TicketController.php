@@ -67,4 +67,17 @@ class TicketController extends Controller
 
         return $resource->response()->setStatusCode(Response::HTTP_OK);
     }
+
+    /**
+     * @throws \Throwable
+     */
+    public function classify(Ticket $ticket): Response
+    {
+        // Dispatch job for async classification
+        \App\Jobs\ClassifyTicket::dispatch($ticket->id);
+
+        return response()->json([
+            'message' => 'Ticket classification job dispatched successfully'
+        ], Response::HTTP_ACCEPTED);
+    }
 }

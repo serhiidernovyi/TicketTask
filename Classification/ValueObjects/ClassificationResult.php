@@ -40,12 +40,4 @@ class ClassificationResult
             'confidence' => $this->confidence,
         ];
     }
-
-    /**
-     * Get confidence as percentage
-     */
-    public function getConfidencePercentage(): int
-    {
-        return (int) round($this->confidence * 100);
-    }
 }

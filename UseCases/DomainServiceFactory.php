@@ -4,18 +4,19 @@ declare(strict_types=1);
 
 namespace UseCases;
 
+use Classification\Contracts\ClassifierInterface;
+use Classification\Services\TicketClassifier;
 use Illuminate\Log\Logger;
 use Illuminate\Support\Arr;
-use Task\Services\TaskService;
 use Ticket\Services\TicketService;
 use Illuminate\Foundation\Application;
-use Task\Contracts\Services\TaskServiceInterface;
 use Ticket\Contracts\Services\TicketServiceInterface;
 
 class DomainServiceFactory
 {
     protected array $bindings = [
         TicketServiceInterface::class => TicketService::class,
+        ClassifierInterface::class => TicketClassifier::class,
     ];
 
     /**

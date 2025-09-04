@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Ticket\Services;
 
 use App\DTO\Ticket\TicketDTO;
+use App\Models\Ticket as TicketModel;
+use Classification\ValueObjects\ClassificationResult;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Ticket\Contracts\Requests\ListInterface;
@@ -63,5 +65,21 @@ class TicketService implements TicketServiceInterface
         $query = $this->ticket->filter($filter);
 
         return $query->paginate($request->getPerPage());
+    }
+
+    public function classify(ClassificationResult $classification, TicketModel $ticket): void
+    {
+        $updateData = [
+            'explanation' => $classification->explanation,
+            'confidence' => $classification->confidence,
+            'category_changed_at' => now(),
+        ];
+
+        if (!$ticket->category_is_manual) {
+            $updateData['category'] = $classification->category;
+            $updateData['category_is_manual'] = false;
+        }
+
+        $ticket->update($updateData);
     }
 }
