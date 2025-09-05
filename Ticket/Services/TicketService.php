@@ -44,13 +44,22 @@ class TicketService implements TicketServiceInterface
 
     public function update(TicketDTO $ticketDto, \App\Models\Ticket $ticket): TicketInterface
     {
-        $ticket->update([
+        $updateData = [
             'subject' => $ticketDto->subject,
             'body' => $ticketDto->body,
             'status' => $ticketDto->status,
             'note' => $ticketDto->note,
-            'category' => $ticketDto->category,
-        ]);
+        ];
+
+        if ($ticketDto->category !== null && $ticketDto->category !== $ticket->category) {
+            $updateData['category'] = $ticketDto->category;
+            $updateData['category_is_manual'] = true;
+            $updateData['category_changed_at'] = now();
+        } elseif ($ticketDto->category !== null) {
+            $updateData['category'] = $ticketDto->category;
+        }
+
+        $ticket->update($updateData);
 
         return $this->getById($ticket->id);
     }
