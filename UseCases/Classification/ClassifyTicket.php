@@ -20,7 +20,7 @@ class ClassifyTicket
     /**
      * Classify a ticket and update it with classification results
      */
-    public function execute(Ticket $ticket): void
+    public function execute(Ticket $ticket, bool $force = false): void
     {
         /** @var TicketClassifier $ticketService */
         $ticketService = $this->domainServiceFactory->create(ClassifierInterface::class);
@@ -28,6 +28,6 @@ class ClassifyTicket
 
         /** @var TicketService $ticketService */
         $ticketService = $this->domainServiceFactory->create(TicketServiceInterface::class);
-        $ticketService->classify($classification, $ticket);
+        $ticketService->classify($classification, $ticket, $force);
     }
 }

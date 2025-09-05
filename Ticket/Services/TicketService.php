@@ -76,7 +76,7 @@ class TicketService implements TicketServiceInterface
         return $query->paginate($request->getPerPage());
     }
 
-    public function classify(ClassificationResult $classification, TicketModel $ticket): void
+    public function classify(ClassificationResult $classification, TicketModel $ticket, bool $force = false): void
     {
         $updateData = [
             'explanation' => $classification->explanation,
@@ -84,7 +84,7 @@ class TicketService implements TicketServiceInterface
             'category_changed_at' => now(),
         ];
 
-        if (!$ticket->category_is_manual) {
+        if (!$ticket->category_is_manual || $force) {
             $updateData['category'] = $classification->category;
             $updateData['category_is_manual'] = false;
         }

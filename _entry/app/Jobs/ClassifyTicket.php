@@ -20,7 +20,8 @@ class ClassifyTicket implements ShouldQueue
      * Create a new job instance.
      */
     public function __construct(
-        public readonly string $ticketId
+        public readonly string $ticketId,
+        public readonly bool $force = false
     ) {
         //
     }
@@ -38,19 +39,30 @@ class ClassifyTicket implements ShouldQueue
             return;
         }
 
+        if ($ticket->category && $ticket->confidence && !$ticket->category_is_manual) {
+            Log::info("Skipping classification for ticket {$this->ticketId} - already AI classified");
+            return;
+        }
+
+        // Skip classification if ticket is manually classified (unless forced)
+        if ($ticket->category_is_manual && !$this->force) {
+            Log::info("Skipping classification for ticket {$this->ticketId} - manually classified");
+            return;
+        }
+
         try {
-            $classifyTicketUseCase->execute($ticket);
+            $classifyTicketUseCase->execute($ticket, $this->force);
             Log::info("Ticket {$this->ticketId} classified successfully");
         } catch (\Exception $e) {
             Log::error("Failed to classify ticket {$this->ticketId}: " . $e->getMessage());
-            
+
             // If rate limit error, retry later
             if (str_contains($e->getMessage(), 'rate limit')) {
                 Log::warning("Rate limit hit for ticket {$this->ticketId}, retrying in 60 seconds");
                 $this->release(60); // Retry in 60 seconds
                 return;
             }
-            
+
             throw $e;
         }
     }

@@ -15,7 +15,7 @@ class ClassifyTicketsCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'tickets:bulk-classify 
+    protected $signature = 'tickets:bulk-classify
                             {--unclassified : Only classify tickets without category}
                             {--all : Classify all tickets}
                             {--force : Force reclassification even if already classified}';
@@ -61,7 +61,7 @@ class ClassifyTicketsCommand extends Command
         $bar->start();
 
         foreach ($tickets as $ticket) {
-            ClassifyTicket::dispatch($ticket->id);
+            ClassifyTicket::dispatch($ticket->id, $this->option('force'));
             $bar->advance();
         }
 
