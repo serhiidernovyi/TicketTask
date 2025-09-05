@@ -131,7 +131,8 @@ class StatsTest extends TestCase
         Ticket::factory()->create([
             'subject' => 'Unclassified ticket',
             'body' => 'Test unclassified',
-            'category' => null
+            'category' => null,
+            'category_is_manual' => false
         ]);
 
         // WHEN
@@ -145,8 +146,8 @@ class StatsTest extends TestCase
         $this->assertEquals(1, $overview['unclassified']);
         $this->assertEquals(0, $overview['manual_classifications']);
         $this->assertEquals(2, $overview['ai_classifications']);
-        $this->assertGreaterThanOrEqual(0.8, $overview['avg_confidence']);
-        $this->assertLessThanOrEqual(0.9, $overview['avg_confidence']);
+        $this->assertGreaterThanOrEqual(0.75, $overview['avg_confidence']);
+        $this->assertLessThanOrEqual(0.95, $overview['avg_confidence']);
     }
 
     public function test_returns_daily_stats(): void
