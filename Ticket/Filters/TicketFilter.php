@@ -12,6 +12,7 @@ class TicketFilter extends AbstractFilter
 {
     public const SEARCH = 'search';
     public const STATUS = 'status';
+    public const CATEGORY = 'category';
     public const CREATED_AT = 'created_at';
     public const SORT_CREATED_AT = 'sort_created_at';
 
@@ -20,9 +21,9 @@ class TicketFilter extends AbstractFilter
         return [
             self::SEARCH => [$this, 'search'],
             self::STATUS => [$this, 'status'],
+            self::CATEGORY => [$this, 'category'],
             self::CREATED_AT => [$this, 'createdAt'],
             self::SORT_CREATED_AT => [$this, 'sortCreatedAt'],
-
         ];
     }
 
@@ -50,5 +51,10 @@ class TicketFilter extends AbstractFilter
     public function status(Builder $builder, $value): void
     {
         $builder->where('status', '=', $value);
+    }
+
+    public function category(Builder $builder, $value): void
+    {
+        $builder->where('category', '=', $value);
     }
 }

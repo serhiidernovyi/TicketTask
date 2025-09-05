@@ -31,6 +31,7 @@ class ListTicketRequest extends FormRequest implements ListInterface
             'status' => 'nullable|string|in:new,open,pending,closed',
             'category' => 'nullable|string|max:255',
             'sort_created_at' => 'nullable|string|sometimes:ASC,DESC',
+            'created_at' => 'nullable|string|max:255',
             'page' => 'nullable|integer|min:1',
             'per_page' => 'nullable|integer|min:1|max:100'
         ];
