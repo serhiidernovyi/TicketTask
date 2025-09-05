@@ -7,7 +7,6 @@ namespace UseCases\Classification;
 use App\Models\Ticket;
 use Classification\Contracts\ClassifierInterface;
 use Classification\Services\TicketClassifier;
-use Illuminate\Support\Facades\Log;
 use Ticket\Contracts\Services\TicketServiceInterface;
 use Ticket\Services\TicketService;
 use UseCases\DomainServiceFactory;

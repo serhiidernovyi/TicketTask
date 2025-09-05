@@ -12,7 +12,6 @@ use App\Resources\Ticket\TicketListResource;
 use App\Resources\Ticket\TicketResource;
 use App\Requests\Ticket\CreateTicketRequest;
 use App\Requests\Ticket\UpdateTicketRequest;
-use App\Requests\Ticket\ClassifyTicketRequest;
 use UseCases\Ticket\Ticket as TicketUseCase;
 use Symfony\Component\HttpFoundation\Response;
 

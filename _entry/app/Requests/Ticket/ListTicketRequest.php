@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Requests\Ticket;
 
 use Ticket\Contracts\Requests\ListInterface;

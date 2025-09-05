@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ticket\Entities;
 
 use Illuminate\Support\Facades\DB;
@@ -164,7 +166,7 @@ class Ticket extends BaseModel implements TicketInterface
             'unclassified' => $unclassified,
             'manual_classifications' => $manualClassifications,
             'ai_classifications' => $aiClassifications,
-            'avg_confidence' => round($avgConfidence, 2),
+            'avg_confidence' => round((float) $avgConfidence, 2),
         ];
     }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ticket\Filters;
 
 use App\Contracts\AbstractFilter;
